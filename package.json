@@ -1,0 +1,25 @@
+{
+  "name": "eve-bot",
+  "version": "0.0.1",
+  "description": "EVE Online bot for Discord",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kallama/eve-bot.git"
+  },
+  "author": "kallama",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kallama/eve-bot/issues"
+  },
+  "homepage": "https://github.com/kallama/eve-bot#readme",
+  "dependencies": {
+    "discord.js": "6.0.0",
+    "request": "2.69.0",
+    "underscore": "1.8.3",
+    "winston": "2.1.1"
+  }
+}
