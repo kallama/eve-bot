@@ -1,2 +1,8 @@
 exports.email = '';
 exports.password = '';
+exports.mysqlHost = 'localhost';
+exports.mysqlUsername = '';
+exports.mysqlPassword = '';
+exports.mysqlDatabase = '';
+exports.excludeUserID = '';
+exports.adminChannelID = '';
