@@ -6,6 +6,7 @@ var winston = require('winston');
 var config = require('./config.js');
 
 var botID = 0;
+var message = '';
 var excludeUserID = config.excludeUserID;
 var adminChannelID = config.adminChannelID;
 
@@ -121,7 +122,7 @@ function checkUsername(user) {
     var message = '';
     if (json.info === null) {
       message = 'ERROR: ' + user.username + ' is not a real eve character name';
-      bot.sendMessage('110597550708375552', message);
+      bot.sendMessage(adminChannelID, message);
       winston.info(user.username + ' not valid');
     }
   }
