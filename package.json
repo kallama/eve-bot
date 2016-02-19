@@ -18,9 +18,11 @@
   "homepage": "https://github.com/kallama/eve-bot#readme",
   "dependencies": {
     "mysql": "2.10.2",
+    "mysql-events": "0.0.7",
     "discord.js": "6.0.0",
     "request": "2.69.0",
     "underscore": "1.8.3",
-    "winston": "2.1.1"
+    "winston": "2.1.1",
+    "moment": "2.11.2"
   }
 }

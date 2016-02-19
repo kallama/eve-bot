@@ -1,8 +1,9 @@
-exports.email = '';
-exports.password = '';
+exports.email = ''; // Discord account email
+exports.password = ''; // Discord account password
 exports.mysqlHost = 'localhost';
 exports.mysqlUsername = '';
 exports.mysqlPassword = '';
 exports.mysqlDatabase = '';
-exports.excludeUserID = '';
-exports.adminChannelID = '';
+exports.excludeUserID = ''; // Exclude a Discord user ID from being checked
+exports.announceChannelID = ''; // Announce fleets/ops to this Discord channel ID
+exports.adminChannelID = ''; // Admin Discord channel ID
