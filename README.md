@@ -3,8 +3,8 @@ eve-bot
 Discord bot for [https://github.com/R4stl1n/allianceauth](https://github.com/R4stl1n/allianceauth)
 
 ### Features
-Announces Discord users that are not using their EVE character name
-Announces Discord users not on auth
+Announces Discord users that are not using their EVE character name  
+Announces Discord users not on auth  
 Announce add/delete for fleet and structure timers
 
 ### Requires

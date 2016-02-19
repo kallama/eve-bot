@@ -25,8 +25,8 @@ con.connect(function(err) {
   winston.info('mysql connection established');
 });
 var dsn = {
-  host:     config.mysqlHost,
-  user:     config.mysqlUsername,
+  host: config.mysqlHost,
+  user: config.mysqlUsername,
   password: config.mysqlPassword
 };
 var conEvents = mysqlEvents(dsn);
