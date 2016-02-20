@@ -1,8 +1,10 @@
 {
   "name": "eve-bot",
   "version": "0.0.1",
-  "description": "EVE Online bot for Discord",
+  "description": "EVE Online allianceauth bot for Discord",
+  "author": "kallama",
   "main": "app.js",
+  "homepage": "https://github.com/kallama/eve-bot#readme",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -10,19 +12,23 @@
     "type": "git",
     "url": "git+https://github.com/kallama/eve-bot.git"
   },
-  "author": "kallama",
-  "license": "MIT",
   "bugs": {
     "url": "https://github.com/kallama/eve-bot/issues"
   },
-  "homepage": "https://github.com/kallama/eve-bot#readme",
+  "keywords": [
+    "eve",
+    "discord",
+    "allianceauth"
+  ],
   "dependencies": {
     "mysql": "2.10.2",
     "mysql-events": "0.0.7",
     "discord.js": "6.0.0",
     "request": "2.69.0",
+    "numeral": "1.5.3",
     "underscore": "1.8.3",
     "winston": "2.1.1",
     "moment": "2.11.2"
-  }
+  },
+  "license": "MIT"
 }
