@@ -6,7 +6,8 @@ Discord bot for [https://github.com/R4stl1n/allianceauth](https://github.com/R4s
 Announces Discord users that are not using their EVE character name  
 Announces Discord users not on auth  
 Announce add/update/delete for fleet and structure timers
-Provides info for zkillboard kill links in chat
+Parses zkillboard kill links in chat
+Announces Alliance/Corp kills and losses to a defined channel
 
 ### Requires
 Node.js v4.0.0+
@@ -33,9 +34,9 @@ restart mysql server
 #### mySQL tables
 Add the mysql_eve_map_solarsystems.txt.gz and mysql_eve_inv_types.txt.gz mySQL tables from http://eve-marketdata.com/developers/mysql.php to the alliance_auth DB
 
-  # wget http://eve-marketdata.com/developers/mysql_eve_map_solarsystems.txt.gz
-  # gunzip mysql_eve_map_solarsystems.txt.gz
-  # wget http://eve-marketdata.com/developers/mysql_eve_inv_types.txt.gz
-  # gunzip mysql_eve_inv_types.txt.gz
-  # mysql -u allianceserver -p alliance_auth < mysql_eve_map_solarsystems.txt
-  # mysql -u allianceserver -p alliance_auth < mysql_eve_inv_types.txt
+	# wget http://eve-marketdata.com/developers/mysql_eve_map_solarsystems.txt.gz
+	# gunzip mysql_eve_map_solarsystems.txt.gz
+	# wget http://eve-marketdata.com/developers/mysql_eve_inv_types.txt.gz
+	# gunzip mysql_eve_inv_types.txt.gz
+	# mysql -u allianceserver -p alliance_auth < mysql_eve_map_solarsystems.txt
+	# mysql -u allianceserver -p alliance_auth < mysql_eve_inv_types.txt

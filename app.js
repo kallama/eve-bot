@@ -6,14 +6,13 @@ var _ = require('underscore');
 var winston = require('winston');
 var moment = require('moment');
 var numeral = require('numeral');
+var CronJob = require('cron').CronJob;
 var config = require('./config.js');
 
 var botID = 0;
 var message = '';
-var excludeUserID = config.excludeUserID;
-var announceChannelID = config.announceChannelID;
-var adminChannelID = config.adminChannelID;
 var zkillboardKillLink = 'zkillboard.com/kill/';
+
 
 winston.add(winston.transports.File, { filename: 'bot.log' });
 var con = mysql.createConnection({
@@ -53,7 +52,9 @@ bot.on('message', function(message) {
   }
   // message contains zkillboard kill link
   if (message.content.indexOf(zkillboardKillLink) !== -1) {
-    displayZkillboardLink(message.content, message.channel);
+    if (config.zkillLinks === true) {
+      displayZkillboardLink(message.content, message.channel);
+    }
   }
 });
 
@@ -65,23 +66,23 @@ bot.on('presence', function(user, status, gameID) {
 
 bot.on('serverNewMember', function(server, user) {
   message = 'New User: ' + user.username + ' joined Discord';
-  bot.sendMessage(adminChannelID, message);
+  bot.sendMessage(config.adminChannelID, message);
   checkUsername(user);
 });
 
 bot.on('serverMemberRemoved', function(server, user) {
   message = 'User Deleted: ' + user.username + ' was removed from Discord';
-  bot.sendMessage(adminChannelID, message);
+  bot.sendMessage(config.adminChannelID, message);
 });
 
 bot.on('userBanned', function(server, user) {
   message = 'User Banned: ' + user.username + ' was banned from Discord';
-  bot.sendMessage(adminChannelID, message);
+  bot.sendMessage(config.adminChannelID, message);
 });
 
 bot.on('userUnbanned', function(server, user) {
   message = 'User Unbanned: ' + user.username + ' was unbanned from Discord';
-  bot.sendMessage(adminChannelID, message);
+  bot.sendMessage(config.adminChannelID, message);
 });
 
 bot.on('error', function(error) {
@@ -112,7 +113,7 @@ var fleetTimers = conEvents.add(
          ' - Fleet Commander **: ' + newRow.fields.fc + '**' +
          ' - Extra Details : **' + newRow.fields.details + '**' +
          ' - Created By: *' + res[0].character_name + '*';
-         bot.sendMessage(announceChannelID, message);
+         bot.sendMessage(config.announceChannelID, message);
          winston.info('new fleet timer announced on Discord');
        }
      });
@@ -132,7 +133,7 @@ var fleetTimers = conEvents.add(
          ' - Fleet Commander **: ' + newRow.fields.fc + '**' +
          ' - Extra Details : **' + newRow.fields.details + '**' +
          ' - Created By: *' + res[0].character_name + '*';
-         bot.sendMessage(announceChannelID, message);
+         bot.sendMessage(config.announceChannelID, message);
          winston.info('updated fleet timer announced on Discord');
        }
      });
@@ -159,7 +160,7 @@ var fleetTimers = conEvents.add(
          ' - Fleet Commander **: ' + oldRow.fields.fc + '**' +
          ' - Extra Details : **' + oldRow.fields.details + '**' +
          ' - Created By: *' + res[0].character_name + '*~~';
-         bot.sendMessage(announceChannelID, message);
+         bot.sendMessage(config.announceChannelID, message);
          winston.info('deleted fleet timer announced on Discord');
        }
      });
@@ -189,7 +190,7 @@ var structureTimers = conEvents.add(
           if (newRow.fields.important === 1) {
             message += ' | **CTA CTA THIS IS *IMPORTANT* :FROGSIREN:**';
           }
-          bot.sendMessage(announceChannelID, message);
+          bot.sendMessage(config.announceChannelID, message);
           winston.info('new structure timer announced on Discord');
         }
       });
@@ -210,7 +211,7 @@ var structureTimers = conEvents.add(
           if (newRow.fields.important === 1) {
             message += ' | **CTA CTA THIS IS *IMPORTANT* :FROGSIREN:**';
           }
-          bot.sendMessage(announceChannelID, message);
+          bot.sendMessage(config.announceChannelID, message);
           winston.info('updated structure timer announced on Discord');
         }
       });
@@ -235,7 +236,7 @@ var structureTimers = conEvents.add(
           ' - Planet/Moon: **' + oldRow.fields.planet_moon + '**' +
           ' - EVE Time: **' + eveTime + '**' +
           ' - Created By: *' + res[0].character_name + '*~~';
-          bot.sendMessage(announceChannelID, message);
+          bot.sendMessage(config.announceChannelID, message);
           winston.info('deleted structure timer announced on Discord');
         }
       });
@@ -258,7 +259,7 @@ function checkUsername(user) {
     return;
   }
   // exclude another bot
-  if (user.id === excludeUserID) {
+  if (user.id === config.excludeUserID) {
     return;
   }
   con.query('SELECT eveonline_evecharacter.character_name FROM eveonline_evecharacter INNER JOIN authentication_authservicesinfo ON eveonline_evecharacter.character_id = authentication_authservicesinfo.main_char_id WHERE authentication_authservicesinfo.discord_uid = ?', [user.id], function(err, res){
@@ -268,7 +269,7 @@ function checkUsername(user) {
       if (user.username !== res[0].character_name) {
         message = 'WARNING: ' + user.username + ' needs to change their Discord name to ' + res[0].character_name;
         bot.sendMessage(user, message);
-        bot.sendMessage(adminChannelID, message);
+        bot.sendMessage(config.adminChannelID, message);
         winston.warn(message);
       }
       // testing
@@ -279,7 +280,7 @@ function checkUsername(user) {
     }
     else {
       message = 'WARNING: ' + user.username + ' is not on auth';
-      bot.sendMessage(adminChannelID, message);
+      bot.sendMessage(config.adminChannelID, message);
       winston.warn(message);
     }
   });
@@ -289,7 +290,7 @@ function checkUsername(user) {
  * [displayZkillboardLink description]
  * @return {[type]} [description]
  */
-function displayZkillboardLink(content, channel) {
+function displayZkillboardLink(content, channel, displayLink) {
   var killID = content.match(/\/kill\/([0-9]+)/i);
   if (killID === null) {
     return;
@@ -335,9 +336,63 @@ function displayZkillboardLink(content, channel) {
         message += 'Damage Taken: **' + numeral(json.victim.damageTaken).format('0,0[.]00') + '** | Pilots Involved: **' + json.attackers.length + '**\n';
         message += 'Ship: **' + shipName + '** | Value: **' + numeral(json.zkb.totalValue).format('0,0[.]00') + '** ISK\n';
         message += 'System: ' + eveData.solarsystem_name + ' <' + round(eveData.security, 2) + '> (' + eveData.region_name + ')';
+        if (displayLink) {
+          message += '\nhttps://zkillboard.com/kill/' + killID[1] + '/';
+        }
         bot.sendMessage(channel, message);
       });
     });
+  });
+}
+
+function checkZkillRedis(allianceOrCorpID, alliance, zkillPostKills, zkillPostLosses) {
+  request('http://redisq.zkillboard.com/listen.php', function (err, res, body) {
+    if (err) winston.error(err);
+    if (err || res.statusCode != 200) {
+      winstin.info('zkillboard redis get failed');
+      return;
+    }
+    var json = JSON.parse(body);
+    // nothing new
+    if (json.package === null) {
+      console.log('null');
+      return;
+    }
+    // post losses
+    if (config.zkillPostLosses === true) {
+      // check if person in an alliance
+      if (json.package.killmail.victim.hasOwnProperty('alliance')) {
+        if (config.allianceOrCorpID === json.package.killmail.victim.alliance.id) {
+          displayZkillboardLink('/kill/' + json.package.killID, config.zkillPostChannelID, true);
+          winston.info('posting loss killID ' + json.package.killID);
+        }
+      }
+      else if (json.package.killmail.victim.hasOwnProperty('corporation')) {
+        if (config.allianceOrCorpID === json.package.killmail.victim.corporation.id) {
+          displayZkillboardLink('/kill/' + json.package.killID, config.zkillPostChannelID, true);
+          winston.info('posting loss killID ' + json.package.killID);
+        }
+      }
+    }
+    // post kills
+    if (config.zkillPostLosses === true) {
+      // do I only care about final blows?
+      var killer = _.find(json.package.killmail.attackers, function(attacker) {
+        // attacker.finalBlow === 1
+        if (attacker.hasOwnProperty('alliance')) {
+          return (config.allianceOrCorpID === attacker.alliance.id);
+        }
+        else if (attacker.hasOwnProperty('corporation')) {
+          return (config.allianceOrCorpID === attacker.corporation.id);
+        }
+        return null;
+      });
+      if (!killer) {
+        return;
+      }
+      displayZkillboardLink('/kill/' + json.package.killID, config.zkillPostChannelID, true);
+      winston.info('posting kill killID ' + json.package.killID);
+    }
   });
 }
 
@@ -347,11 +402,25 @@ function round(num, places) {
   return Math.round(num * multiplier) / multiplier;
 }
 
+/**
+ * CRON
+ */
 
+if ((config.zkillPostKills || config.zkillPostLosses) && config.allianceOrCorpID !== 0 && config.zkillPostChannelID !== '') {
+  new CronJob('*/2 * * * * *', function() {
+   checkZkillRedis(config.allianceOrCorpID, config.alliance, config.zkillPostKills, config.zkillPostLosses);
+   }, null, true, 'Europe/London');
+}
 
 //setTimeout(function() { console.log("setTimeout: It's been one second!"); }, 120000);*/
 
-
+/*
+CREST ENDPOINTS
+https://public-crest.eveonline.com/types/
+https://public-crest.eveonline.com/solarsystems/
+https://public-crest.eveonline.com/alliances/
+https://public-crest.eveonline.com/corporations/ // doesn't work yet
+ */
 
 
 /*request('http://evewho.com/api.php?type=character&name=' + user.username, function (error, response, body) {
@@ -360,7 +429,7 @@ function round(num, places) {
     var message = '';
     if (json.info === null) {
       message = 'ERROR: ' + user.username + ' is not a real eve character name';
-      bot.sendMessage(adminChannelID, message);
+      bot.sendMessage(config.adminChannelID, message);
       winston.info(user.username + ' not valid');
     }
   }
