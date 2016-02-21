@@ -7,6 +7,7 @@ var winston = require('winston');
 var moment = require('moment');
 var numeral = require('numeral');
 var CronJob = require('cron').CronJob;
+var Datastore = require('nedb');
 var config = require('./config.js');
 
 var botID = 0;
@@ -31,6 +32,7 @@ var dsn = {
   password: config.mysqlPassword
 };
 var conEvents = mysqlEvents(dsn);
+var db = new Datastore({ filename: 'timers.db', autoload: true });
 var bot = new discord.Client();
 
 
@@ -104,17 +106,22 @@ var fleetTimers = conEvents.add(
        if (err) winston.error(err);
        if (res.length > 0) {
          var eveTime = moment(newRow.fields.start).format('YYYY-MM-DD HH:mm:ss');
-         message = '**Fleet Timer Added** - ' + newRow.fields.operation_name + ': ' +
+         message = ' - ' + newRow.fields.operation_name + ': ' +
          ' - Doctrine: **' + newRow.fields.doctrine + '**' +
          ' - System: **' + newRow.fields.system + '**' +
          ' - Location: **' + newRow.fields.location + '**' +
          ' - Start Time: **' + eveTime + '**' +
          ' - Duration: **' + newRow.fields.duration + '**' +
          ' - Fleet Commander **: ' + newRow.fields.fc + '**' +
-         ' - Extra Details : **' + newRow.fields.details + '**' +
-         ' - Created By: *' + res[0].character_name + '*';
+         ' - Extra Details : **' + newRow.fields.details + '**';
+         // track timer
+         addTimer(message, newRow.fields.start, 'fleet', newRow.fields.id);
+         // add first part
+         message = '**Fleet Timer Added**' + message + ' - Created By: *' + res[0].character_name + '*';
          bot.sendMessage(config.announceChannelID, message);
          winston.info('new fleet timer announced on Discord');
+
+
        }
      });
    }
@@ -124,15 +131,18 @@ var fleetTimers = conEvents.add(
        if (err) winston.error(err);
        if (res.length > 0) {
          var eveTime = moment(newRow.fields.start).format('YYYY-MM-DD HH:mm:ss');
-         message = '**Fleet Timer Updated** - ' + newRow.fields.operation_name + ': ' +
+         message = ' - ' + newRow.fields.operation_name + ': ' +
          ' - Doctrine: **' + newRow.fields.doctrine + '**' +
          ' - System: **' + newRow.fields.system + '**' +
          ' - Location: **' + newRow.fields.location + '**' +
          ' - Start Time: **' + eveTime + '**' +
          ' - Duration: **' + newRow.fields.duration + '**' +
          ' - Fleet Commander **: ' + newRow.fields.fc + '**' +
-         ' - Extra Details : **' + newRow.fields.details + '**' +
-         ' - Created By: *' + res[0].character_name + '*';
+         ' - Extra Details : **' + newRow.fields.details + '**';
+         // track timer
+         updateTimer(message, newRow.fields.start, 'fleet', newRow.fields.id);
+         // add first part
+         message = '**Fleet Timer Updated**' + message + ' - Created By: *' + res[0].character_name + '*';
          bot.sendMessage(config.announceChannelID, message);
          winston.info('updated fleet timer announced on Discord');
        }
@@ -160,6 +170,8 @@ var fleetTimers = conEvents.add(
          ' - Fleet Commander **: ' + oldRow.fields.fc + '**' +
          ' - Extra Details : **' + oldRow.fields.details + '**' +
          ' - Created By: *' + res[0].character_name + '*~~';
+         // track timer
+         deleteTimer(oldRow.fields.id);
          bot.sendMessage(config.announceChannelID, message);
          winston.info('deleted fleet timer announced on Discord');
        }
@@ -180,16 +192,19 @@ var structureTimers = conEvents.add(
             return;
           }
           var eveTime = moment(newRow.fields.eve_time).format('YYYY-MM-DD HH:mm:ss');
-          message = '**Structure Timer Added** - **' + newRow.fields.objective + '**: ' +
+          message = ' - **' + newRow.fields.objective + '**: ' +
           ' - Details: **' + newRow.fields.details + '**' +
           ' - Structure: **' + newRow.fields.structure + '**' +
           ' - System: **' + newRow.fields.system + '**' +
           ' - Planet/Moon: **' + newRow.fields.planet_moon + '**' +
-          ' - EVE Time: **' + eveTime + '**' +
-          ' - Created By: *' + res[0].character_name + '*';
+          ' - EVE Time: **' + eveTime + '**';
           if (newRow.fields.important === 1) {
             message += ' | **CTA CTA THIS IS *IMPORTANT* :FROGSIREN:**';
           }
+          // track timer
+          addTimer(message, newRow.fields.eve_time, 'structure', newRow.fields.id);
+          // add first part
+          message = '**Structure Timer Added**' + message + ' - Created By: *' + res[0].character_name + '*';
           bot.sendMessage(config.announceChannelID, message);
           winston.info('new structure timer announced on Discord');
         }
@@ -206,11 +221,14 @@ var structureTimers = conEvents.add(
           ' - Structure: **' + newRow.fields.structure + '**' +
           ' - System: **' + newRow.fields.system + '**' +
           ' - Planet/Moon: **' + newRow.fields.planet_moon + '**' +
-          ' - EVE Time: **' + eveTime + '**' +
-          ' - Created By: *' + res[0].character_name + '*';
+          ' - EVE Time: **' + eveTime + '**';
           if (newRow.fields.important === 1) {
             message += ' | **CTA CTA THIS IS *IMPORTANT* :FROGSIREN:**';
           }
+          // track timer
+          updateTimer(message, newRow.fields.eve_time, 'fleet', newRow.fields.id);
+          // add first part
+          message = '**Structure Timer Updated**' + message + ' - Created By: *' + res[0].character_name + '*';
           bot.sendMessage(config.announceChannelID, message);
           winston.info('updated structure timer announced on Discord');
         }
@@ -236,6 +254,8 @@ var structureTimers = conEvents.add(
           ' - Planet/Moon: **' + oldRow.fields.planet_moon + '**' +
           ' - EVE Time: **' + eveTime + '**' +
           ' - Created By: *' + res[0].character_name + '*~~';
+          // track timer
+          deleteTimer(oldRow.fields.id);
           bot.sendMessage(config.announceChannelID, message);
           winston.info('deleted structure timer announced on Discord');
         }
@@ -286,6 +306,100 @@ function checkUsername(user) {
   });
 }
 
+function addTimer(message, date, type, timerID) {
+  //var dateObj = new Date(date);
+  var doc = {
+    timer_id: timerID,
+    date: date,
+    type: type,
+    message: message,
+    sixty_minute_announce: false,
+    thirty_minute_announce: false,
+    five_minute_announce: false
+  };
+  db.insert(doc, function (err, newDoc) {
+    if (err) winston.error(err);
+    winston.info('timer added to memory db');
+  });
+}
+
+function updateTimer(message, date, type, timerID) {
+  //var dateObj = new Date(date);
+  var doc = {
+    timer_id: timerID,
+    date: date,
+    type: type,
+    message: message
+  };
+  db.update({ timer_id: timerID }, { $set: doc }, {}, function (err, numReplaced) {
+    if (err) winston.error(err);
+    if (numReplaced !== 1) {
+      winston.error('update problem to memory db, timer_id ' + timerID);
+    }
+    else {
+      winston.info('timer updated to memory db');
+    }
+  });
+}
+
+function deleteTimer(timerID) {
+  db.remove({ timer_id: timerID }, {}, function (err, numRemoved) {
+    if (err) winston.error(err);
+    if (numRemoved < 1) {
+      winston.error('no timer deleted');
+    }
+    else {
+      winston.info('timer deleted from memory db');
+    }
+  });
+}
+
+function announceTimers() {
+  db.find({ $or: [{ sixty_minute_announce: false }, { thirty_minute_announce: false }, { five_minute_announce: false }] }, function (err, docs) {
+    if (err) winston.error(err);
+    var now = new Date();
+    var nowUTC = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),  now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds());
+    _.each(docs, function(doc) {
+      var nowUTCModified = nowUTC;
+      var timer = new Date(doc.date);
+      var message = '';
+      if (nowUTC > timer) {
+        return;
+      }
+      if (!doc.sixty_minute_announce) {
+        nowUTCModified.setMinutes(nowUTCModified.getMinutes() + 60);
+        if (nowUTCModified >= timer) {
+          message = '**Operation Starting in 30 minutes**' + doc.message;
+          bot.sendMessage(config.announceChannelID, message);
+          db.update({ timer_id: doc.timer_id }, { $set: { sixty_minute_announce: true } }, {}, function (err, numReplaced) {
+            if (err) winston.error(err);
+          });
+        }
+      }
+      else if (!doc.thirty_minute_announce) {
+        nowUTCModified.setMinutes(nowUTCModified.getMinutes() + 30);
+        if (nowUTCModified >= timer) {
+          message = '**Timer Exits in 30 Minutes*​**' + doc.message;
+          bot.sendMessage(config.announceChannelID, message);
+          db.update({ timer_id: doc.timer_id }, { $set: { thirty_minute_announce: true } }, {}, function (err, numReplaced) {
+            if (err) winston.error(err);
+          });
+        }
+      }
+      else if (!doc.five_minute_announce) {
+        nowUTCModified.setMinutes(nowUTCModified.getMinutes() + 5);
+        if (nowUTCModified >= timer) {
+          message = '**Timer Exits in 5 Minutes*​**' + doc.message;
+          bot.sendMessage(config.announceChannelID, message);
+          db.update({ timer_id: doc.timer_id }, { $set: { five_minute_announce: true } }, {}, function (err, numReplaced) {
+            if (err) winston.error(err);
+          });
+        }
+      }
+    });
+  });
+}
+
 /**
  * [displayZkillboardLink description]
  * @return {[type]} [description]
@@ -331,8 +445,8 @@ function displayZkillboardLink(content, channel, displayLink) {
           killarAllianceOrCorp = killer.corporationName;
         }
         var message = '';
-        message = '**' + json.victim.characterName + '** (' + victimAllianceOrCorp + ') lost their **' + shipName + '** in **' + eveData.solarsystem_name;
-        message += '** killed by **' + killer.characterName + '** (' + killarAllianceOrCorp + ')\n';
+        message = '**' + json.victim.characterName + '** (' + victimAllianceOrCorp + ') lost their **' + shipName + '** in **' + eveData.solarsystem_name + '** (' + eveData.region_name + ') ';
+        message += 'killed by **' + killer.characterName + '** (' + killarAllianceOrCorp + ')\n';
         message += 'Damage Taken: **' + numeral(json.victim.damageTaken).format('0,0[.]00') + '** | Pilots Involved: **' + json.attackers.length + '**\n';
         message += 'Ship: **' + shipName + '** | Value: **' + numeral(json.zkb.totalValue).format('0,0[.]00') + '** ISK\n';
         message += 'System: ' + eveData.solarsystem_name + ' <' + round(eveData.security, 2) + '> (' + eveData.region_name + ')';
@@ -355,7 +469,11 @@ function checkZkillRedis(allianceOrCorpID, alliance, zkillPostKills, zkillPostLo
     var json = JSON.parse(body);
     // nothing new
     if (json.package === null) {
-      console.log('null');
+      //console.log('null'); // testing
+      return;
+    }
+    // skip if value 10,000 or less empty pods
+    if (json.package.zkb.totalValue <= 10000) {
       return;
     }
     // post losses
@@ -405,6 +523,10 @@ function round(num, places) {
 /**
  * CRON
  */
+
+new CronJob('*/30 * * * * *', function() {
+  announceTimers();
+}, null, true, 'Europe/London');
 
 if ((config.zkillPostKills || config.zkillPostLosses) && config.allianceOrCorpID !== 0 && config.zkillPostChannelID !== '') {
   new CronJob('*/2 * * * * *', function() {
