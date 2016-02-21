@@ -153,6 +153,8 @@ var fleetTimers = conEvents.add(
      con.query('SELECT character_name FROM eveonline_evecharacter WHERE id = ?', [oldRow.fields.eve_character_id], function(err, res) {
        if (err) winston.error(err);
        if (res.length > 0) {
+         // delete temp timer
+         deleteTimer(oldRow.fields.id);
          // don't announce deletion of expire fleet
          var now = new Date();
          var now_utc = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),  now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds());
@@ -170,8 +172,6 @@ var fleetTimers = conEvents.add(
          ' - Fleet Commander **: ' + oldRow.fields.fc + '**' +
          ' - Extra Details : **' + oldRow.fields.details + '**' +
          ' - Created By: *' + res[0].character_name + '*~~';
-         // track timer
-         deleteTimer(oldRow.fields.id);
          bot.sendMessage(config.announceChannelID, message);
          winston.info('deleted fleet timer announced on Discord');
        }
@@ -239,6 +239,8 @@ var structureTimers = conEvents.add(
       con.query('SELECT character_name FROM eveonline_evecharacter WHERE id = ?', [oldRow.fields.eve_character_id], function(err, res) {
         if (err) winston.error(err);
         if (res.length > 0) {
+          // delete temp timer
+          deleteTimer(oldRow.fields.id);
           // don't announce deletion of expire fleet
           var now = new Date();
           var now_utc = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),  now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds());
@@ -255,7 +257,6 @@ var structureTimers = conEvents.add(
           ' - EVE Time: **' + eveTime + '**' +
           ' - Created By: *' + res[0].character_name + '*~~';
           // track timer
-          deleteTimer(oldRow.fields.id);
           bot.sendMessage(config.announceChannelID, message);
           winston.info('deleted structure timer announced on Discord');
         }
