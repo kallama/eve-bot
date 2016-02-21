@@ -379,7 +379,7 @@ function announceTimers() {
       else if (!doc.thirty_minute_announce) {
         nowUTCModified.setMinutes(nowUTCModified.getMinutes() + 30);
         if (nowUTCModified >= timer) {
-          message = '**Timer Exits in 30 Minutes*​**' + doc.message;
+          message = '**Timer Exits in 30 Minutes*​*' + doc.message;
           bot.sendMessage(config.announceChannelID, message);
           db.update({ timer_id: doc.timer_id }, { $set: { thirty_minute_announce: true } }, {}, function (err, numReplaced) {
             if (err) winston.error(err);
@@ -389,7 +389,7 @@ function announceTimers() {
       else if (!doc.five_minute_announce) {
         nowUTCModified.setMinutes(nowUTCModified.getMinutes() + 5);
         if (nowUTCModified >= timer) {
-          message = '**Timer Exits in 5 Minutes*​**' + doc.message;
+          message = '**Timer Exits in 5 Minutes*​*' + doc.message;
           bot.sendMessage(config.announceChannelID, message);
           db.update({ timer_id: doc.timer_id }, { $set: { five_minute_announce: true } }, {}, function (err, numReplaced) {
             if (err) winston.error(err);
