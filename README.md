@@ -5,10 +5,10 @@ Discord bot for [https://github.com/R4stl1n/allianceauth](https://github.com/R4s
 ### Features
 Announces Discord users that are not using their EVE character name  
 Announces Discord users not on auth  
-Announce add/update/delete for fleet and structure timers
-Announce timer 60, 30, and 5 minutes before
-Parses zkillboard kill links in chat
-Announces Alliance/Corp kills and losses to a defined channel
+Announce add/update/delete for fleet and structure timers  
+Announce timer 60, 30, and 5 minutes before  
+Parses zkillboard kill links in chat  
+Announces Alliance/Corp kills and losses to a defined channel  
 
 ### Requires
 Node.js v4.0.0+
