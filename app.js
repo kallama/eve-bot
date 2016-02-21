@@ -377,6 +377,7 @@ function announceTimers() {
         }
       }
       else if (!doc.thirty_minute_announce) {
+        nowUTCModified = nowUTC;
         nowUTCModified.setMinutes(nowUTCModified.getMinutes() + 30);
         if (nowUTCModified >= timer) {
           message = '**Timer Exits in 30 Minutes*​*' + doc.message;
@@ -387,6 +388,7 @@ function announceTimers() {
         }
       }
       else if (!doc.five_minute_announce) {
+        nowUTCModified = nowUTC;
         nowUTCModified.setMinutes(nowUTCModified.getMinutes() + 5);
         if (nowUTCModified >= timer) {
           message = '**Timer Exits in 5 Minutes*​*' + doc.message;
