@@ -120,8 +120,9 @@ var fleetTimers = conEvents.add(
          message = '**Fleet Timer Added**' + message + ' - Created By: *' + res[0].character_name + '*';
          bot.sendMessage(config.announceChannelID, message);
          winston.info('new fleet timer announced on Discord');
-
-
+       }
+       else {
+         winston.error('no newRow.fields.eve_character_id match');
        }
      });
    }
@@ -145,6 +146,9 @@ var fleetTimers = conEvents.add(
          message = '**Fleet Timer Updated**' + message + ' - Created By: *' + res[0].character_name + '*';
          bot.sendMessage(config.announceChannelID, message);
          winston.info('updated fleet timer announced on Discord');
+       }
+       else {
+         winston.error('no newRow.fields.eve_character_id match');
        }
      });
    }
@@ -174,6 +178,9 @@ var fleetTimers = conEvents.add(
          ' - Created By: *' + res[0].character_name + '*~~';
          bot.sendMessage(config.announceChannelID, message);
          winston.info('deleted fleet timer announced on Discord');
+       }
+       else {
+         winston.error('no newRow.fields.eve_character_id match');
        }
      });
    }
@@ -208,6 +215,9 @@ var structureTimers = conEvents.add(
           bot.sendMessage(config.announceChannelID, message);
           winston.info('new structure timer announced on Discord');
         }
+        else {
+          winston.error('no newRow.fields.eve_character_id match');
+        }
       });
     }
     // update
@@ -231,6 +241,9 @@ var structureTimers = conEvents.add(
           message = '**Structure Timer Updated**' + message + ' - Created By: *' + res[0].character_name + '*';
           bot.sendMessage(config.announceChannelID, message);
           winston.info('updated structure timer announced on Discord');
+        }
+        else {
+          winston.error('no newRow.fields.eve_character_id match');
         }
       });
     }
@@ -259,6 +272,9 @@ var structureTimers = conEvents.add(
           // track timer
           bot.sendMessage(config.announceChannelID, message);
           winston.info('deleted structure timer announced on Discord');
+        }
+        else {
+          winston.error('no newRow.fields.eve_character_id match');
         }
       });
     }
