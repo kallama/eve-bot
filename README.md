@@ -26,7 +26,8 @@ Edit your /etc/mysql/my.cnf file and add the following under [mysqld]
 	log_bin          = /var/log/mysql/mysql-bin.log
 	expire_logs_days = 10            # optional
 	max_binlog_size  = 100M          # optional
-  binlog_format    = row
+	binlog_format    = row
+
 
 restart mysql server
 
