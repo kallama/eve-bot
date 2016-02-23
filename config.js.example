@@ -1,4 +1,4 @@
-config: {
+config = {
   email: '', // Discord account email
   password: '', // Discord account password
   mysqlHost: 'localhost',
