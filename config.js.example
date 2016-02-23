@@ -1,18 +1,18 @@
 config = {
-  email = ''; // Discord account email
-  password = ''; // Discord account password
-  mysqlHost = 'localhost';
-  mysqlUsername = '';
-  mysqlPassword = '';
-  mysqlDatabase = '';
-  excludeUserID = ''; // Exclude a Discord user ID from being checked
-  announceChannelID = ''; // Announce fleets/ops to this Discord channel ID
-  adminChannelID = ''; // Admin Discord channel ID
-  zkillLinks: true, // expand on zkill links
+  email = '', // Discord account email
+  password = '', // Discord account password
+  mysqlHost = 'localhost',
+  mysqlUsername = 'allianceserver',
+  mysqlPassword = '',
+  mysqlDatabase = 'alliance_auth',
+  excludeUserID = '', // Exclude a Discord user ID from being checked
+  announceChannelID = '', // Announce fleets/ops to this Discord channel ID
+  adminChannelID = '', // Admin Discord channel ID
+  zkillLinks: true, // parse zkillboard kill links
   alliance: true, // set true for alliance or false for corp
   allianceOrCorpID: 0, // your corp or alliance EVE ID
   zkillPostKills: true, // post alliance or corp kills
-  zkillPostLosses: true, // post alliance or corp kills
+  zkillPostLosses: true, // post alliance or corp losses
   zkillPostChannelID: '' // Discord channel to post kills and losses to
 };
 module.exports = config;
