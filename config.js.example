@@ -15,4 +15,4 @@ config: {
   zkillPostLosses: true, // post alliance or corp losses
   zkillPostChannelID: '' // Discord channel to post kills and losses to
 };
-module.exports: config;
+module.exports = config;
