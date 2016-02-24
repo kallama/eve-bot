@@ -5,13 +5,15 @@ Discord bot for [https://github.com/R4stl1n/allianceauth](https://github.com/R4s
 ### Features
 Announces Discord users that are not using their EVE character name  
 Announces Discord users not on auth  
-Announce add/update/delete for fleet and structure timers  
-Announce timer 60, 30, and 5 minutes before  
+Announce add/update/delete for fleet and structure timers on AllianceAuth  
+Announce add/delete for timers on Fleet-Up  
+Announce timer 60, 30, and 5 minutes before for AllianceAuth and Fleet-Up  
 Parses zkillboard kill links in chat  
 Announces alliance/corp kills and losses to a defined channel  
 
 ### Requires
 Node.js v4.0.0+
+MySQL 5.5.47+
 
 #### To use mysql-events
 Run the following SQL commands as the mysql root user:

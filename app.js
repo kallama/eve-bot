@@ -151,7 +151,7 @@ function displayZkillboardLink(content, channel, displayLink) {
   request('https://zkillboard.com/api/killID/' + killID[1], function (err, res, body) {
     if (err) winston.error(err);
     if (err || res.statusCode != 200) {
-      winstin.info('zkillboard api get failed on killid ' + killID[1]);
+      winstin.error('zkillboard api get failed on killid ' + killID[1]);
       return;
     }
     var jsonArray = JSON.parse(body);
@@ -159,14 +159,14 @@ function displayZkillboardLink(content, channel, displayLink) {
     con.query('SELECT name FROM eve_inv_types WHERE type_id = ?', [json.victim.shipTypeID], function(err, res) {
       if (err) winston.error(err);
       if (res.length <= 0) {
-        winstin.info('shipTypeID ' + json.victim.shipTypeID + ' not found');
+        winstin.error('shipTypeID ' + json.victim.shipTypeID + ' not found');
         return;
       }
       var shipName = res[0].name;
       con.query('SELECT solarsystem_name, region_name, security FROM eve_map_solarsystems WHERE solarsystem_id = ?', [json.solarSystemID], function(err, res) {
         if (err) winston.error(err);
         if (res.length <= 0) {
-          winstin.info('solarSystemID ' + json.solarSystemID + ' not found');
+          winstin.error('solarSystemID ' + json.solarSystemID + ' not found');
           return;
         }
         var eveData = res[0];
@@ -200,7 +200,7 @@ function checkZkillRedis(allianceOrCorpID, alliance, zkillPostKills, zkillPostLo
   request('http://redisq.zkillboard.com/listen.php', function (err, res, body) {
     if (err) winston.error(err);
     if (err || res.statusCode != 200) {
-      winstin.info('zkillboard redis get failed');
+      winstin.error('zkillboard redis get failed');
       return;
     }
     var json = JSON.parse(body);
@@ -285,7 +285,7 @@ https://public-crest.eveonline.com/corporations/ // doesn't work yet
     if (json.info === null) {
       message = 'ERROR: ' + user.username + ' is not a real eve character name';
       bot.sendMessage(config.adminChannelID, message);
-      winston.info(user.username + ' not valid');
+      winston.error(user.username + ' not valid');
     }
   }
 });*/

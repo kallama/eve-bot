@@ -16,7 +16,9 @@ config = {
   zkillPostChannelID: '', // Discord channel to post kills and losses to
   allianceAuthTimers: true, // Announce Alliance Auth structure and op timers
   fleetUpTimers: false, // Announce Fleet-Up Timers
-  fleetUpUserID: 0,
-  fleetUpAPICode: ''
+  fleetUpAppKey: '',
+  fleetUpUserID: 0,  // needs Read-only permission of Timers & Operations
+  fleetUpAPICode: '',
+  fleetUpGroupID: 0 // optional, limit scope to 1 group on Fleet-Up
 };
 module.exports = config;
