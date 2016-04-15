@@ -74,6 +74,7 @@ module.exports = function(bot, winston) {
                  console.log(date.format());
                  message = '**Operation Starting in 30 minutes**' + composeMessage(doc);
                  bot.sendMessage(config.announceChannelID, message);
+                 winston.info(message);
                  db.update({ TimerId: doc.TimerId }, { $set: { sixty_minute_announce: true } }, {}, function (err, numReplaced) {
                    if (err) winston.error(err);
                  });
@@ -84,6 +85,7 @@ module.exports = function(bot, winston) {
                if (nowModified >= date) {
                  message = '**Timer Exits in 30 Minutes*​*' + composeMessage(doc);
                  bot.sendMessage(config.announceChannelID, message);
+                 winston.info(message);
                  db.update({ TimerId: doc.TimerId }, { $set: { thirty_minute_announce: true } }, {}, function (err, numReplaced) {
                    if (err) winston.error(err);
                  });
@@ -94,6 +96,7 @@ module.exports = function(bot, winston) {
                if (nowModified >= date) {
                  message = '**Timer Exits in 5 Minutes*​*' + composeMessage(doc);
                  bot.sendMessage(config.announceChannelID, message);
+                 winston.info(message);
                  db.update({ TimerId: doc.TimerId }, { $set: { five_minute_announce: true } }, {}, function (err, numReplaced) {
                    if (err) winston.error(err);
                  });
@@ -207,7 +210,7 @@ module.exports = function(bot, winston) {
      });
      // announce deleted timer if fleet time > now
      var now = moment.utc();
-     var date = moment.utc(doc.ExpiresString);
+     var date = moment.utc(timer.ExpiresString);
      if (now.diff(date) > 0) {
        var message = '**Timer Deleted** ~~' + composeMessage(timer) + '~~';
        bot.sendMessage(config.announceChannelID, message);

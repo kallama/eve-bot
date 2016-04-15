@@ -12,7 +12,7 @@ Parses zkillboard kill links in chat
 Announces alliance/corp kills and losses to a defined channel  
 
 ### Requires
-Node.js v4.0.0+
+Node.js v4.0.0+  
 MySQL 5.5.47+
 
 #### To use mysql-events

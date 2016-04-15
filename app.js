@@ -267,6 +267,14 @@ if ((config.zkillPostKills || config.zkillPostLosses) && config.allianceOrCorpID
    }, null, true, 'Europe/London');
 }
 
+/**
+ * Keep MySQL connection alive
+ */
+
+setInterval(function () {
+  db.query('SELECT 1');
+}, 5000);
+
 //setTimeout(function() { console.log("setTimeout: It's been one second!"); }, 120000);*/
 
 /*
