@@ -272,7 +272,7 @@ if ((config.zkillPostKills || config.zkillPostLosses) && config.allianceOrCorpID
  */
 
 setInterval(function () {
-  db.query('SELECT 1');
+  con.query('SELECT 1');
 }, 5000);
 
 //setTimeout(function() { console.log("setTimeout: It's been one second!"); }, 120000);*/
