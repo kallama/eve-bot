@@ -30,7 +30,7 @@ module.exports = function(bot, winston) {
             request(url, function (err, res, body) {
               if (err) winston.error(err);
               if (err || res.statusCode != 200) {
-                winstin.error('http://api.fleet-up.com api get failed on timer get');
+                winston.error('http://api.fleet-up.com api get failed on timer get');
                 return;
               }
               var json = JSON.parse(body);
@@ -119,7 +119,7 @@ module.exports = function(bot, winston) {
        request(url, function (err, res, body) {
          if (err) winston.error(err);
          if (err || res.statusCode != 200) {
-           winstin.error('http://api.fleet-up.com api get failed on timer get');
+           winston.error('http://api.fleet-up.com api get failed on timer get');
            return;
          }
          var json = JSON.parse(body);
