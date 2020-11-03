@@ -21,7 +21,7 @@
     "allianceauth"
   ],
   "dependencies": {
-    "mysql": "2.10.2",
+    "mysql": ">=2.14.0",
     "mysql-events": "0.0.7",
     "discord.js": "6.0.0",
     "request": "2.69.0",
